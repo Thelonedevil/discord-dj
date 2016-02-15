@@ -17,20 +17,25 @@ import java.util.Set;
 public class App {
     public static JDA jda;
     public static Set<String> playList = new LinkedHashSet<>();
+    public static String folder;
 
     public static void main(String[] args) {
         try {
-            Files.walk(Paths.get(System.getProperty("user.home") + "/.discord-dj")).forEach(filePath -> {
-                if (Files.isRegularFile(filePath)) {
-                    File file = filePath.toFile();
-                    playList.add(file.getAbsolutePath());
-                }
-            });
+            if (args.length > 2) {
+                folder = args[2];
+            } else {
+                folder = System.getProperty("user.home") + "/.discord-dj";
+            }
+            if (!new File(folder).exists()) {
+                new File(folder).mkdirs();
+            }
+            loadSongs();
         } catch (IOException e) {
             e.printStackTrace();
         }
 
         playList.forEach(System.out::println);
+        System.out.println(playList.size());
         try {
             jda = new JDABuilder().setEmail(args[0]).setPassword(args[1]).addListener(new MyListenerAdapter()).buildAsync();
         } catch (LoginException e) {
@@ -38,6 +43,17 @@ public class App {
         }
 
 
+    }
+
+    public static void loadSongs() throws IOException {
+        playList.clear();
+        Files.walk(Paths.get(folder)).forEach(filePath -> {
+            if (Files.isRegularFile(filePath)) {
+                File file = filePath.toFile();
+                if (filePath.toString().endsWith(".mp3") || filePath.toString().endsWith(".flac"))
+                    playList.add(file.getAbsolutePath());
+            }
+        });
     }
 
 
