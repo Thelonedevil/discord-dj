@@ -6,6 +6,7 @@ import net.dv8tion.jda.JDABuilder;
 import javax.security.auth.login.LoginException;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.FileVisitOption;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.LinkedHashSet;
@@ -34,7 +35,7 @@ public class App {
             e.printStackTrace();
         }
 
-        playList.forEach(System.out::println);
+        //playList.forEach(System.out::println);
         System.out.println(playList.size());
         try {
             jda = new JDABuilder().setEmail(args[0]).setPassword(args[1]).addListener(new MyListenerAdapter()).buildAsync();
@@ -47,7 +48,7 @@ public class App {
 
     public static void loadSongs() throws IOException {
         playList.clear();
-        Files.walk(Paths.get(folder)).forEach(filePath -> {
+        Files.walk(Paths.get(folder), FileVisitOption.FOLLOW_LINKS).forEach(filePath -> {
             if (Files.isRegularFile(filePath)) {
                 File file = filePath.toFile();
                 if (filePath.toString().endsWith(".mp3") || filePath.toString().endsWith(".flac"))
